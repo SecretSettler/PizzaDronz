@@ -10,6 +10,9 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Arrays;
 
+/**
+ * Class of restaurants
+ */
 public class Restaurant {
 
     @JsonProperty("name")
@@ -21,30 +24,56 @@ public class Restaurant {
     @JsonProperty("menu")
     private Menu[] menu;
 
+    /**
+     * Restaurant name getter
+     *
+     * @return name of the restaurant
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     * Latitude value getter
+     *
+     * @return value of latitude
+     */
     public double getLatitude() {
         return latitude;
     }
 
+    /**
+     * Longitude value getter
+     *
+     * @return value of longitude
+     */
     public double getLongitude() {
         return longitude;
     }
 
+    /**
+     * Array of menus getter
+     *
+     * @return array of menus
+     */
     public Menu[] getMenu() {
         return menu;
     }
 
-    public static Restaurant[] getRestaurantsFromServer(URL serverBaseAddress) throws IOException{
+    /**
+     * Parse and deserialize information of restaurants from json file on the server
+     * @param serverBaseAddress URL of the server
+     * @return Array of restaurants
+     * @throws IOException IO exception
+     */
+    public static Restaurant[] getRestaurantsFromServer(URL serverBaseAddress) throws IOException {
         try {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
             return objectMapper.readValue(
-                    serverBaseAddress, new TypeReference<Restaurant[]>(){});
-        }
-        catch (MalformedURLException e) {
+                    serverBaseAddress, new TypeReference<Restaurant[]>() {
+                    });
+        } catch (MalformedURLException e) {
             e.printStackTrace();
         }
         return null;

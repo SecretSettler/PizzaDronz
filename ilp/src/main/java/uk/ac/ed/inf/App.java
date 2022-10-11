@@ -7,8 +7,7 @@ import java.net.URL;
 import static uk.ac.ed.inf.Restaurant.getRestaurantsFromServer;
 
 /**
- * Hello world!
- *
+ * Class of simple app
  */
 public class App 
 {
@@ -20,5 +19,7 @@ public class App
         String[] pizzas = {"Meat Lover", "Vegan Delight"};
         int price = Order.getDeliveryCost(participants, pizzas);
         System.out.println("Total cost is " + price + " pence");
+        LngLat p = new LngLat(-3.189319,55.944618);
+        System.out.println(p.isCentralArea());
     }
 }
