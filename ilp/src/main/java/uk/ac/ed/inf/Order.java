@@ -5,7 +5,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.HashMap;
 
 /**
- * @author Yinsicheng Jiang s2020153
  * Class of order
  */
 public class Order {
@@ -27,10 +26,22 @@ public class Order {
     @JsonProperty("orderItems")
     public String[] orderItems;
 
-
+    public enum OrderOutcome {
+        Delivered ,
+        ValidButNotDelivered ,
+        InvalidCardNumber ,
+        InvalidExpiryDate ,
+        InvalidCvv ,
+        InvalidTotal ,
+        InvalidPizzaNotDefined ,
+        InvalidPizzaCount ,
+        InvalidPizzaCombinationMultipleSuppliers ,
+        Invalid
+    }
+    
     /**
      * Class of tuple data type.
-     * Later the information for each pizza can be stored as tuples in the form of {"name":
+     * Later the information for each pizza can be stored as a hashmap of tuples in the form of {"name": (restaurant, price)}
      */
     private static class Tuple {
         public String restaurant;
@@ -64,9 +75,13 @@ public class Order {
 
         // Check whether the pizza combination is valid or not.
         for (String pizza : pizzas) {
-            if (!dishes.get(pizza).restaurant.equals(lastRestaurant) && lastRestaurant != null) {
+            if (dishes.get(pizza) != null && !dishes.get(pizza).restaurant.equals(lastRestaurant) && lastRestaurant != null) {
                 throw new Exception("InvalidPizzaCombinationException");
-            } else {
+            }
+            else if (dishes.get(pizza) == null) {
+                throw new Exception(String.valueOf(OrderOutcome.InvalidPizzaNotDefined));
+            }
+            else {
                 lastRestaurant = dishes.get(pizza).restaurant;
                 totalPrice += dishes.get(pizza).price;
             }

@@ -21,8 +21,9 @@ public class CentralSingleton {
     public LngLat[] points;
 
     /**
-     * Constructor for the singleton class
-     * @throws MalformedURLException URL exception
+     * Constructor for the singleton class contains vertex coordinates
+     *
+     * @throws MalformedURLException URL exception for invalid url form
      */
     private CentralSingleton() throws MalformedURLException {
         points = getCoordinates();
@@ -30,20 +31,25 @@ public class CentralSingleton {
 
     /**
      * Get the singleton instance
+     *
      * @return the singleton instance
-     * @throws MalformedURLException URL exception
      */
-    public static CentralSingleton getInstance() throws MalformedURLException {
-        if (centralSingleton == null) {
-            centralSingleton = new CentralSingleton();
+    public static CentralSingleton getInstance() {
+        try {
+            if (centralSingleton == null) {
+                centralSingleton = new CentralSingleton();
+            }
+            return centralSingleton;
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
         }
         return centralSingleton;
     }
 
     /**
-     * Parse and get the area coordinates from the server.
+     * Parse and get the area vertex coordinates from the server.
      * @return Array of Vertex coordinates parsed from the json file on the server.
-     * @throws MalformedURLException URL exception
+     * @throws MalformedURLException invalid URL exception
      */
     public LngLat[] getCoordinates() throws MalformedURLException {
         URL url = new URL("https://ilp-rest.azurewebsites.net/centralArea");
@@ -51,9 +57,9 @@ public class CentralSingleton {
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
             return objectMapper.readValue(
-                    url, new TypeReference<LngLat[]>(){});
-        }
-        catch (IOException e) {
+                    url, new TypeReference<LngLat[]>() {
+                    });
+        } catch (IOException e) {
             e.printStackTrace();
         }
         return null;

@@ -6,6 +6,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
  * Class of Menu
  */
 public class Menu {
+
+    //Parse json into parameters
     @JsonProperty("name")
     private String name;
     @JsonProperty("priceInPence")

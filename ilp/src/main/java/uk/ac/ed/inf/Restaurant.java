@@ -64,17 +64,17 @@ public class Restaurant {
      * Parse and deserialize information of restaurants from json file on the server
      * @param serverBaseAddress URL of the server
      * @return Array of restaurants
-     * @throws IOException IO exception
      */
-    public static Restaurant[] getRestaurantsFromServer(URL serverBaseAddress) throws IOException {
+    public static Restaurant[] getRestaurantsFromRestServer(URL serverBaseAddress){
         try {
+            String furtherAddress = "/restaurants";
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.configure(DeserializationFeature.USE_JAVA_ARRAY_FOR_JSON_ARRAY, true);
             return objectMapper.readValue(
-                    serverBaseAddress, new TypeReference<Restaurant[]>() {
+                    new URL(serverBaseAddress, furtherAddress), new TypeReference<Restaurant[]>() {
                     });
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
+        } catch (IOException f){
+            f.printStackTrace();
         }
         return null;
     }
@@ -88,15 +88,6 @@ public class Restaurant {
                 ", menu=" + Arrays.toString(getMenu()) +
                 '}';
     }
-
-//    public static void main(String[] args) throws IOException {
-//        Restaurant[] fks = getRestaurantsFromServer(new URL("https://ilp-rest.azurewebsites.net/" + "restaurants" ));
-//        for (Restaurant restaurant:fks){
-//            System.out.println(restaurant.toString());
-//        }
-//
-//    }
-
 
 }
 

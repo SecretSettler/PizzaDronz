@@ -1,7 +1,6 @@
 package uk.ac.ed.inf;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.net.MalformedURLException;
 
@@ -11,6 +10,7 @@ import java.net.MalformedURLException;
 
 public class LngLat {
 
+    // Parse json into parameters
     @JsonAlias("longitude")
     public double lng;
 
@@ -79,6 +79,7 @@ public class LngLat {
             p2 = polygon[j % numPoints];
             if (point.lng >= Math.min(p1.lng, p2.lng) &&
                     point.lng <= Math.max(p1.lng, p2.lng)) {
+                // lines formed by the point and related vertices on the sides should have the same slope as the sides.
                 pdLine = Math.abs((point.lng - p1.lng) * (p1.lat - p2.lat) - (p1.lng - p2.lng)
                         * (point.lat - p1.lat)) < epsilon; // for calibrating the error from double calculation
                 if (pdLine) {
@@ -92,6 +93,7 @@ public class LngLat {
         // by every two continuous points.
         for (i = 1; i <= numPoints; i++) {
             p2 = polygon[i % numPoints];
+            // Check whether the point is inside the domain.
             if (point.lng > Math.min(p1.lng, p2.lng) &&
                     point.lng <= Math.max(p1.lng, p2.lng)) {
                 if (point.lat <= Math.max(p1.lat, p2.lat)) {
@@ -113,9 +115,8 @@ public class LngLat {
      * Check whether the object is inside the central area
      *
      * @return true if it's inside, false otherwise.
-     * @throws MalformedURLException Invalid URL
      */
-    public boolean isCentralArea() throws MalformedURLException {
+    public boolean inCentralArea(){
         CentralSingleton centralSingleton = CentralSingleton.getInstance();
         if (centralSingleton == null) {
             return false;
@@ -156,6 +157,7 @@ public class LngLat {
         if (direction == null) {
             return this;  // Return current position
         }
+        // Calculate new coordinates according to directions
         double newLng = lng + TOLERANCE * Math.cos(Math.toRadians(direction.angle));
         double newLat = lat + TOLERANCE * Math.sin(Math.toRadians(direction.angle));
         return new LngLat(newLng, newLat);
