@@ -7,8 +7,8 @@ package uk.ac.ed.inf;
 public class CreditCardCheck {
     // Return true if the card number is valid. In PizzaDronz, we assume the number of digits can only be 16.
     public static boolean validitychk(long cnumber) {
-        return (thesize(cnumber) == 16) && multiPrefixMatch(cnumber, "Visa-16", 0) ||
-                multiPrefixMatch(cnumber, "MC", 2) || multiPrefixMatch(cnumber, "MC", 5)
+        return (thesize(cnumber) == 16) && (multiPrefixMatch(cnumber, "Visa-16", 0) ||
+                multiPrefixMatch(cnumber, "MC", 2) || multiPrefixMatch(cnumber, "MC", 5))
                 && ((sumdoubleeven(cnumber) + sumodd(cnumber)) % 10 == 0);
     }
 

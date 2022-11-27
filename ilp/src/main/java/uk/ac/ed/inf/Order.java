@@ -147,22 +147,6 @@ public class Order {
         return null;
     }
 
-    public static ArrayList<LngLat> getLngLatFromOrders(ArrayList<Order> orders, Restaurant[] restaurants) {
-        ArrayList<LngLat> lngLats = new ArrayList<>();
-        ArrayList<String> repPizzas = new ArrayList<>();
-        for (Order order : orders) {
-            repPizzas.add(order.orderItems[0]);
-        }
-        for (String pizza : repPizzas) {
-            for (Restaurant restaurant : restaurants) {
-                if (restaurant.getNameOfDishesFromMenus(restaurant.getMenu()).contains(pizza)) {
-                    lngLats.add(new LngLat(restaurant.getLongitude(), restaurant.getLatitude()));
-                }
-            }
-        }
-        return lngLats;
-    }
-
     public static LngLat getLngLatFromOrder(Order order, Restaurant[] restaurants) {
         String name = order.orderItems[0];
         // Because we won't deliver invalid orders, thus definitely all pizzas should come from
