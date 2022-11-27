@@ -2,7 +2,10 @@ package uk.ac.ed.inf;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 
+import java.awt.geom.Line2D;
+import java.awt.geom.Point2D;
 import java.net.MalformedURLException;
+import java.util.Objects;
 
 /**
  * Class of the coordinate system with methods checking the relation among various object positions.
@@ -21,6 +24,8 @@ public class LngLat {
     public String name;
 
     private final double TOLERANCE = 0.00015;
+
+    private final double EPSILON = 1e-12;
 
     /**
      * Helper Constructor for receiving longitude and latitude from json.
@@ -48,9 +53,22 @@ public class LngLat {
         NNE(67.5), N(90.0), NNW(112.5),
         NW(135.0), WNW(157.5), W(180.0),
         WSW(202.5), SW(225.0), SSW(247.5),
-        S(270.0), SSE(292.5), SE(315), ESE(337.5);
+        S(270.0), SSE(292.5), SE(315), ESE(337.5),
+        HOVER(-1.0);
 
-        public double angle;
+        private final double angle;
+
+        public double getAngle(){
+            return angle;
+        }
+
+        public Direction reverseAngle(){
+            for (Direction d: Direction.values()){
+                double epsilon = 1e-12;
+                if (Math.abs(d.getAngle() - (angle + 180.0) % 360.0) < epsilon) return d;
+            }
+            return HOVER;
+        }
 
         Direction(double angle) {
             this.angle = angle;
@@ -81,7 +99,7 @@ public class LngLat {
                     point.lng <= Math.max(p1.lng, p2.lng)) {
                 // lines formed by the point and related vertices on the sides should have the same slope as the sides.
                 pdLine = Math.abs((point.lng - p1.lng) * (p1.lat - p2.lat) - (p1.lng - p2.lng)
-                        * (point.lat - p1.lat)) < epsilon; // for calibrating the error from double calculation
+                        * (point.lat - p1.lat)) < EPSILON; // for calibrating the error from double calculation
                 if (pdLine) {
                     return true;
                 }
@@ -99,7 +117,7 @@ public class LngLat {
                 if (point.lat <= Math.max(p1.lat, p2.lat)) {
                     if (p1.lng != p2.lng) {
                         x_interceptions = (point.lng - p1.lng) * (p2.lat - p1.lat) / (p2.lng - p1.lng) + p1.lat;
-                        if (p1.lat == p2.lat || point.lat < x_interceptions || Math.abs(point.lat - x_interceptions) < epsilon) {
+                        if (p1.lat == p2.lat || point.lat < x_interceptions || Math.abs(point.lat - x_interceptions) < EPSILON) {
                             count++;
                         }
                     }
@@ -122,6 +140,26 @@ public class LngLat {
             return false;
         }
         return isInPolygon(new LngLat(lng, lat), centralSingleton.points);
+    }
+
+    public boolean intersectWithNoFlyZones(LngLat next){
+        boolean intersect;
+        NoFlySingleton noFlySingleton = NoFlySingleton.getInstance();
+        Line2D line = new Line2D.Double(new Point2D.Double(lng, lat), new Point2D.Double(next.lng, next.lat));
+        if (noFlySingleton == null){
+            return false;
+        }
+
+        for (NoFlySingleton.NoFlyZone noFlyZone : noFlySingleton.allNoFlyZones) {
+            LngLat[] lngLats = noFlyZone.transfer2LngLat();
+            for (int i = 0; i < lngLats.length - 1; i++){
+                intersect = line.intersectsLine(lngLats[i].lng, lngLats[i].lat, lngLats[i + 1].lng, lngLats[i + 1].lat);
+                if (intersect){
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**
@@ -170,9 +208,18 @@ public class LngLat {
      */
     @Override
     public String toString() {
-        return "LngLat{" +
-                "lng=" + lng +
-                ", lat=" + lat +
-                '}';
+        return "[" +
+                lng +
+                ", " + lat +
+                "]";
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        LngLat lngLat = (LngLat) o;
+        return Double.compare(lngLat.lng, lng) == 0 && Double.compare(lngLat.lat, lat) == 0;
+    }
+
 }

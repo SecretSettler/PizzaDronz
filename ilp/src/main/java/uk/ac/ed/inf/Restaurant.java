@@ -8,6 +8,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Arrays;
 
 /**
@@ -74,9 +75,19 @@ public class Restaurant {
                     new URL(serverBaseAddress, furtherAddress), new TypeReference<Restaurant[]>() {
                     });
         } catch (IOException f){
-            f.printStackTrace();
+            System.out.println("[ERROR] INVALID URL!!!");
+            System.out.println(">>> SYSTEM EXIT <<<");
+            System.exit(-1);
         }
         return null;
+    }
+
+    public ArrayList<String> getNameOfDishesFromMenus(Menu[] menus){
+        ArrayList<String> names = new ArrayList<>();
+        for (Menu menu: menus){
+            names.add(menu.getName());
+        }
+        return names;
     }
 
     @Override

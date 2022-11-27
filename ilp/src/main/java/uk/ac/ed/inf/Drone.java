@@ -1,0 +1,147 @@
+package uk.ac.ed.inf;
+
+import com.google.gson.JsonArray;
+import com.google.gson.JsonObject;
+
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+
+public class Drone {
+    public URL baseURL;
+    public String dateTime;
+    public Order[] orders;
+    public ArrayList<Order> filteredOrders;
+    public HashMap<Order, String> invalidOrders;
+    public final int BATTERY = 2000;
+
+    public Drone(URL baseURL, String dateTime, Restaurant[] restaurants) {
+        this.baseURL = baseURL;
+        this.dateTime = dateTime;
+        orders = Order.getOrdersFromServer(baseURL, dateTime);
+        filteredOrders = Order.ordersFilter(orders, restaurants);
+        System.out.println();
+        System.out.println("[RESULT] TOTAL NUMBER OF VALID DELIVERIES: " + filteredOrders.size());
+        System.out.println();
+        Order.sortOrders(filteredOrders, restaurants);
+        invalidOrders = Order.invalidOrders(orders, restaurants);
+    }
+
+    public ArrayList<JsonArray> deliver(ArrayList<Order> orders) {
+        Greedy greedy = new Greedy();
+        int totalMoves = 0;
+        ArrayList<JsonArray> allJson = new ArrayList<>();
+        JsonArray deliveries = new JsonArray();
+        JsonArray flightPath = new JsonArray();
+        JsonArray points = new JsonArray();
+        if (orders == null) {
+            System.out.println("No invalid orders");
+        } else {
+            int k = 0;
+            for (Order order : orders) {
+                if (totalMoves <= BATTERY) {
+                    ArrayList<Greedy.Node> steps = orderPath(order, greedy);
+                    if (totalMoves + steps.size() > BATTERY) {
+                        JsonObject record = conditionPath(order, "power out");
+                        deliveries.add(record);
+                    } else {
+                        JsonObject record = conditionPath(order, "valid");
+                        flightPath = findFlightPath(flightPath, steps, order);
+                        points = pointsForGeoJson(points, steps);
+                        totalMoves += steps.size();
+                        deliveries.add(record);
+                        k++;
+                    }
+                }
+            }
+            allJson.add(deliveries);
+            allJson.add(flightPath);
+            allJson.add(points);
+            System.out.println();
+            System.out.println("[RESULT] TOTAL NUMBER OF SUCCESSFUL DELIVERIES: "+ k);
+            System.out.println();
+        }
+        return allJson;
+    }
+
+    public ArrayList<Greedy.Node> finalPath(ArrayList<Greedy.Node> path, Map map){
+        ArrayList<Greedy.Node> reversePath = new ArrayList<>(path.stream().map(Greedy.Node::cloneNode).toList());
+        Collections.reverse(reversePath);
+        var directionList = reversePath.stream().map(d->d.direction).toList();
+        for (Greedy.Node node : reversePath) {
+            node.ticksSinceStartOfCalculation = System.nanoTime();
+        }
+        for (int i = 0; i < reversePath.size()-1; i++) {
+            reversePath.get(i+1).direction = directionList.get(i).reverseAngle();
+        }
+
+        reversePath.get(0).direction = null; // Hover when reach the restaurant
+        path.addAll(reversePath);
+        path.add(map.START); // Hover when back to AT
+        return path;
+    }
+
+    public ArrayList<Greedy.Node> orderPath(Order order, Greedy greedy){
+        Map map = new Map(baseURL, order);
+        ArrayList<Greedy.Node> steps = greedy.start(map);
+        steps = finalPath(steps, map);
+        return steps;
+    }
+
+    public JsonObject conditionPath(Order order, String condition){
+        if (condition.equals("power out")) {
+            DeliveriesJson deliveriesJson = new DeliveriesJson(order.orderNo,
+                    Order.OrderOutcome.ValidButNotDelivered + " Sorry the drone is out of service",
+                    Integer.parseInt(order.priceTotalInPence));
+            // Because we have filtered orders that have invalid total payments, so we can directly
+            // use the money paid in the order.
+            return deliveriesJson.generateJson();
+        }
+
+        else if (condition.equals("valid")){
+            DeliveriesJson deliveriesJson = new DeliveriesJson(order.orderNo,
+                    String.valueOf(Order.OrderOutcome.Delivered),
+                    Integer.parseInt(order.priceTotalInPence));
+            return deliveriesJson.generateJson();
+        }
+
+        else {
+            System.out.println("UNKNOWN CONDITION FOR THE DRONE!");
+            System.out.println(">>> SYSTEM EXIT <<<");
+            System.exit(-1);
+        }
+        return null;
+    }
+
+    public JsonArray findFlightPath(JsonArray flightPath, ArrayList<Greedy.Node> steps, Order order){
+        for (int i = 0; i < steps.size() - 1; i++) {
+            Greedy.Node node1 = steps.get(i);
+            Greedy.Node node2 = steps.get(i + 1);
+            if (node2.direction != null){
+                FlightPathJson flightPathJson = new FlightPathJson(order.orderNo,
+                        node1.lngLat.lng, node1.lngLat.lat, node2.direction.getAngle(),
+                        node2.lngLat.lng, node2.lngLat.lat, node2.ticksSinceStartOfCalculation);
+                JsonObject jsonObject = flightPathJson.generateJson();
+                flightPath.add(jsonObject);
+            } else {
+                FlightPathJson flightPathJson = new FlightPathJson(order.orderNo,
+                        node1.lngLat.lng, node1.lngLat.lat, null,
+                        node2.lngLat.lng, node2.lngLat.lat, node2.ticksSinceStartOfCalculation);
+                JsonObject jsonObject = flightPathJson.generateJson();
+                flightPath.add(jsonObject);
+            }
+        }
+        return flightPath;
+    }
+
+    public JsonArray pointsForGeoJson(JsonArray points, ArrayList<Greedy.Node> steps){
+        for (Greedy.Node node: steps) {
+            JsonArray coords = new JsonArray();
+            coords.add(node.lngLat.lng);
+            coords.add(node.lngLat.lat);
+            points.add(coords);
+        }
+        return points;
+    }
+}
