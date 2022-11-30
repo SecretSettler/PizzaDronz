@@ -57,6 +57,11 @@ public class Order {
         }
     }
 
+    /**
+     * Get all dishes from the restaurants
+     * @param restaurants Restaurants
+     * @return Hashmap that represents the information of dishes
+     */
     public static HashMap<String, Tuple> getDishes(Restaurant[] restaurants) {
         HashMap<String, Tuple> dishes = new HashMap<>();
         // Put dishes of restaurants inside the hashmap for further reference.
@@ -68,13 +73,21 @@ public class Order {
         return dishes;
     }
 
+    /**
+     * Check whether the combination of pizzas for an order is valid or not.
+     * @param restaurants All restaurants
+     * @param pizzas Order Items
+     * @throws Exception Catch the exception and return the corresponding order outcome.
+     */
     public static void pizzaCombinationCheck(Restaurant[] restaurants, String[] pizzas) throws Exception {
         String lastRestaurant = null;
         HashMap<String, Tuple> dishes = getDishes(restaurants);
         if (pizzas.length > 4) {
+            // If the length of order items > 4
             throw new Exception(OrderOutcome.InvalidPizzaCount + " You can only order 4 pizzas at most");
         }
         for (String pizza : pizzas) {
+            // Different restaurants
             if (dishes.get(pizza) != null && !dishes.get(pizza).restaurant.equals(lastRestaurant) && lastRestaurant != null) {
                 throw new Exception(OrderOutcome.InvalidPizzaCombinationMultipleSuppliers +
                         " You can only order pizzas from one restaurant");
@@ -87,13 +100,21 @@ public class Order {
         }
     }
 
+    /**
+     * Check the payment is valid or not, like cvv, card number, and expiry date
+     * @param restaurants All restaurants
+     * @param order a given order
+     * @throws Exception Catch the exception and return the corresponding order outcome.
+     */
     public static void paymentCheck(Restaurant[] restaurants, Order order) throws Exception {
         long cardNumber = Long.parseLong(order.creditCardNumber);
         if (!CreditCardCheck.validitychk(cardNumber)) {
+            // Invalid credit card number
             throw new Exception(OrderOutcome.InvalidCardNumber + " Invalid credit card number provided");
         }
         var i = Integer.parseInt(order.orderDate.substring(0, 2)
                 + order.creditCardExpiry.substring(3, 5));
+        // Invalid expiry date, by using matching
         if ((Integer.parseInt(order.orderDate.substring(0, 4)) > i) ||
                 ((Integer.parseInt(order.orderDate.substring(0, 4)) == i) &&
                         (Integer.parseInt(order.orderDate.substring(5, 7)) >
@@ -131,6 +152,12 @@ public class Order {
         return totalPrice;
     }
 
+    /**
+     * Get the orders of a day from the server
+     * @param baseURL server address
+     * @param date the date
+     * @return the array of orders
+     */
     public static Order[] getOrdersFromServer(URL baseURL, String date) {
         try {
             String furtherAddress = "/orders/" + date;
@@ -147,6 +174,12 @@ public class Order {
         return null;
     }
 
+    /**
+     * Get the coordinate of the restaurant from the order.
+     * @param order A given order
+     * @param restaurants All restaurants
+     * @return The coordinate of the restaurant
+     */
     public static LngLat getLngLatFromOrder(Order order, Restaurant[] restaurants) {
         String name = order.orderItems[0];
         // Because we won't deliver invalid orders, thus definitely all pizzas should come from
@@ -159,6 +192,12 @@ public class Order {
         return null;
     }
 
+    /**
+     * Filter out invalid orders
+     * @param orders all orders of the day
+     * @param restaurants all restaurants
+     * @return Valid orders
+     */
     public static ArrayList<Order> ordersFilter(Order[] orders, Restaurant[] restaurants) {
         if (orders == null) {
             return null;
@@ -177,6 +216,9 @@ public class Order {
         return orderArrList;
     }
 
+    /**
+     * Return all invalid orders
+     */
     public static HashMap<Order, String> invalidOrders(Order[] orders, Restaurant[] restaurants){
         if (orders == null) {
             return null;
@@ -193,6 +235,9 @@ public class Order {
         return invalidOrders;
     }
 
+    /**
+     * Sort all valid orders by the distance to the destination from the start point
+     */
     public static void sortOrders(ArrayList<Order> orders, Restaurant[] restaurants) {
         if (orders == null){
             return;

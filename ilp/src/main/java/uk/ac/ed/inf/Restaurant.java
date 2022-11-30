@@ -82,6 +82,11 @@ public class Restaurant {
         return null;
     }
 
+    /**
+     * Get the name of dishes from the menus of the restaurant
+     * @param menus The menu of the restaurant
+     * @return The names of the dishes
+     */
     public ArrayList<String> getNameOfDishesFromMenus(Menu[] menus){
         ArrayList<String> names = new ArrayList<>();
         for (Menu menu: menus){

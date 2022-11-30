@@ -10,11 +10,17 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 
+/**
+ * Singleton class for no-fly zones
+ */
 public class NoFlySingleton {
 
     private static NoFlySingleton noFlySingleton;
     public NoFlyZone[] allNoFlyZones;
 
+    /**
+     * Class for one no-fly zone
+     */
     public static class NoFlyZone {
         @JsonProperty("name")
         private String name;
@@ -29,6 +35,10 @@ public class NoFlySingleton {
             return coordinates;
         }
 
+        /**
+         * Transfer the format into LngLat
+         * @return The array of the transferred points
+         */
         public LngLat[] transfer2LngLat() {
             ArrayList<LngLat> lngLats = new ArrayList<>();
             for (double[] i : coordinates) {
@@ -45,6 +55,11 @@ public class NoFlySingleton {
         }
     }
 
+    /**
+     * Get no-fly zones from the server
+     * @return Array of no-fly zones
+     * @throws MalformedURLException Exception
+     */
     public NoFlyZone[] getNoFlyZones() throws MalformedURLException {
         URL url = new URL("https://ilp-rest.azurewebsites.net/noflyzones");
         try {
@@ -59,11 +74,18 @@ public class NoFlySingleton {
         return null;
     }
 
-
+    /**
+     * Private constructor for singleton
+     * @throws MalformedURLException Exception
+     */
     private NoFlySingleton() throws MalformedURLException {
         allNoFlyZones = getNoFlyZones();
     }
 
+    /**
+     * Instance getter
+     * @return The singleton instance
+     */
     public static NoFlySingleton getInstance() {
         try {
             if (noFlySingleton == null) {

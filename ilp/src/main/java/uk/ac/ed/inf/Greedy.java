@@ -5,8 +5,14 @@ import java.util.ArrayList;
 import java.util.PriorityQueue;
 import java.util.Queue;
 
+/**
+ * Greedy Best First Search algorithm class
+ */
 public class Greedy{
 
+    /**
+     * Node Class for storing the positions and conditions of the drone after one movement.
+     */
     public static class Node implements Comparable<Node> {
         public LngLat lngLat;
         public Node parent;
@@ -39,6 +45,9 @@ public class Greedy{
         }
     }
 
+    /**
+     * Constructor
+     */
     public Greedy(){
 
     }
@@ -46,16 +55,33 @@ public class Greedy{
     Queue<Node> openList = new PriorityQueue<>();
     ArrayList<Node> closeList = new ArrayList<>();
 
+    /**
+     * Check whether the node is closed to the destination.
+     * @param end The coordinate of the destination
+     * @param current The coordinate of the current position
+     * @return true if current position is near the destination
+     */
     private boolean isNearEndNode(LngLat end, LngLat current){
         return current.closeTo(end);
     }
 
+    /**
+     * Check whether the next movement is valid or not.
+     * @param lngLat The coordinate of the next movement.
+     * @param current Current position
+     * @return true if the next movement is valid.
+     */
     private boolean canAddNodeToOpen(LngLat lngLat, Node current){
         if (!current.isInCentral && lngLat.inCentralArea()) return false;
         if (current.lngLat.intersectWithNoFlyZones(lngLat)) return false;
         return !isLngLatInClosed(lngLat);
     }
 
+    /**
+     * Check if the coordinate has been searched and added to the path.
+     * @param lngLat The examined coordinate
+     * @return true if the condition is satisfied.
+     */
     private boolean isLngLatInClosed(LngLat lngLat){
         if (lngLat == null || closeList.isEmpty()) return false;
         for (Node node: closeList) {
@@ -66,6 +92,11 @@ public class Greedy{
         return false;
     }
 
+    /**
+     * Check whether the last node has been closed to the destination
+     * @param end The coordination of the destination
+     * @return true if reach the destination
+     */
     private boolean isPointNearEndInClosed(LngLat end){
         for (Node node: closeList) {
             if (isNearEndNode(end, node.lngLat)){
@@ -75,10 +106,21 @@ public class Greedy{
         return false;
     }
 
+    /**
+     * Calculate the distance to the destination from the current position.
+     * @param end The coordinate of the destination
+     * @param current The current position
+     * @return the distance
+     */
     private double calcH(LngLat end, LngLat current){
         return current.distanceTo(end);
     }
 
+    /**
+     * Find the node that has been searched before
+     * @param lngLat
+     * @return The node that has the same coordinate
+     */
     private Node findNodeInOpen(LngLat lngLat){
         if (lngLat == null || openList.isEmpty()) return null;
         for (Node node: openList){
@@ -89,6 +131,11 @@ public class Greedy{
         return null;
     }
 
+    /**
+     * Iterate all the possibilities for the next movement
+     * @param current
+     * @param end
+     */
     private void addNeighbourNode(Node current, LngLat end){
         addNeighbourNode(current, end, LngLat.Direction.E);
         addNeighbourNode(current, end, LngLat.Direction.ENE);
@@ -108,6 +155,12 @@ public class Greedy{
         addNeighbourNode(current, end, LngLat.Direction.ESE);
     }
 
+    /**
+     * Add those valid possibilities inside the open list
+     * @param current The current position
+     * @param end The end position
+     * @param direction The possible direction
+     */
     private void addNeighbourNode(Node current, LngLat end, LngLat.Direction direction){
         if (canAddNodeToOpen(current.lngLat.nextPosition(direction), current)){
             boolean isInCentral = current.lngLat.nextPosition(direction).inCentralArea();
@@ -120,6 +173,11 @@ public class Greedy{
         }
     }
 
+    /**
+     * Start the search algorithm with the given map
+     * @param map The map of the order
+     * @return The steps of route
+     */
     public ArrayList<Node> start(Map map){
         if (map == null) return null;
         openList.clear();
@@ -130,6 +188,11 @@ public class Greedy{
         return move(map);
     }
 
+    /**
+     * Move the drone!!!
+     * @param map The map of the order
+     * @return The steps of route
+     */
     public ArrayList<Node> move(Map map){
         ArrayList<Node> steps = new ArrayList<>();
         while (!openList.isEmpty()){

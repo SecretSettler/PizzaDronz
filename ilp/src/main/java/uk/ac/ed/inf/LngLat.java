@@ -4,8 +4,6 @@ import com.fasterxml.jackson.annotation.JsonAlias;
 
 import java.awt.geom.Line2D;
 import java.awt.geom.Point2D;
-import java.net.MalformedURLException;
-import java.util.Objects;
 
 /**
  * Class of the coordinate system with methods checking the relation among various object positions.
@@ -58,10 +56,17 @@ public class LngLat {
 
         private final double angle;
 
+        /**
+         * Get the angle
+         */
         public double getAngle(){
             return angle;
         }
 
+        /**
+         * Reverse the angle
+         * @return The opposite direction
+         */
         public Direction reverseAngle(){
             for (Direction d: Direction.values()){
                 double epsilon = 1e-12;
@@ -142,6 +147,12 @@ public class LngLat {
         return isInPolygon(new LngLat(lng, lat), centralSingleton.points);
     }
 
+    /**
+     * Check whether the next movement is valid or not. It cannot be inside the no-fly zones and also cannot cross the
+     * no-fly zones.
+     * @param next the coordinate of the next movement.
+     * @return true if the next movement is invalid.
+     */
     public boolean intersectWithNoFlyZones(LngLat next){
         boolean intersect;
         NoFlySingleton noFlySingleton = NoFlySingleton.getInstance();
@@ -214,6 +225,11 @@ public class LngLat {
                 "]";
     }
 
+    /**
+     * Overriding function
+     * @param o object
+     * @return whether the coordinates are equal or not
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
