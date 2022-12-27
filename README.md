@@ -10,4 +10,8 @@ NOTE: You must have jdk-18 or above.\
 The result is like:\
 ![result](result.png)
 \
-The preliminary score is 23.5/25
+| Scoring Stage | Score |
+| :---: | :---: |
+| Coursework-1 | 23.5/25 |
+| :---:   | :---: |
+| Coursework-2 | ~/75 |
