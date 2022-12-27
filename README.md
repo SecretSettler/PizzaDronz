@@ -6,7 +6,7 @@ You can simply run the following command in cmd to start the system.
 java -jar ilp/target/PizzaDronz-1.0-SNAPSHOT.jar [YOURSERVER] [DATE] 
 ```
 NOTE: You must have jdk-18 or above.\
-\s\s\s\s\s\s The information stored in your server must be written in JSONArray or a single JSON.
+**The information stored in your server must be written in JSONArray or a single JSON.**\
 \
 The result is like:\
 ![result](result.png)
