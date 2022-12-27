@@ -5,4 +5,7 @@ You can simply run the following code in cmd to start the system.
 ```
 java -jar ilp/target/PizzaDronz-1.0-SNAPSHOT.jar YOURSERVER DATE 
 ```
-NOTE: You must have jdk-18 or above.
+NOTE: You must have jdk-18 or above.\
+\
+The result is like:\
+
