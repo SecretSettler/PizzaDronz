@@ -8,7 +8,7 @@ java -jar ilp/target/PizzaDronz-1.0-SNAPSHOT.jar [YOURSERVER] [DATE]
 NOTE:\
 **You must have jdk-18 or above.**\
 **The information stored in your server must be written in JSONArray or a single JSON.**\
-**Your Date should be in a form of YYYY-MM-DD**\
+**Your Date should be in the form of YYYY-MM-DD**\
 \
 The result is like:\
 ![result](result.png)
