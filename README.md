@@ -10,7 +10,7 @@ NOTE: You must have jdk-18 or above.\
 The result is like:\
 ![result](result.png)
 \
-| Scoring Stage | Score |
+| Score table | Score |
 | :---: | :---: |
 | Coursework-1 | 23.5/25 |
 | Coursework-2 | ~/75 |
