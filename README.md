@@ -13,5 +13,4 @@ The result is like:\
 | Scoring Stage | Score |
 | :---: | :---: |
 | Coursework-1 | 23.5/25 |
-| :---:   | :---: |
 | Coursework-2 | ~/75 |
