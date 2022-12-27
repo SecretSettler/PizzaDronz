@@ -1,6 +1,6 @@
 # PizzaDronz
 Welcome to PizzaDronz.\
-This is a drone system that can help deliver pizzas to students who are working hard in the Appleton Tower (UoE, Edinburgh, UK).\
+This is a drone system that helps deliver pizzas to students who are working hard in the Appleton Tower (UoE, Edinburgh, UK).\
 You can simply run the following command in cmd to start the system.
 ```
 java -jar ilp/target/PizzaDronz-1.0-SNAPSHOT.jar YOURSERVER DATE 
