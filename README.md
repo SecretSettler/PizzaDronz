@@ -15,4 +15,5 @@ The result is like:\
 | Score table | Score |
 | :---: | :---: |
 | Coursework-1 | 23.5/25 |
-| Coursework-2 | ~/75 |
+| Coursework-2 | 61.75/75 |
+| Overall      | 85.25/100 |
